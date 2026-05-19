@@ -17,6 +17,7 @@ spec:
       containers:
         - name: eczane-php-konteyner # Konteynera verdigimiz ozel isim.
           image: europe-west1-docker.pkg.dev/final-projesi-k8s/eczane-repo/eczane-app:latest
+          imagePullPolicy: Always
           # NOT: Buradaki imaji 'latest' yerine '$COMMIT_SHA' yaptim. 
           # Boylece Cloud Build her tetiklendiginde en guncel bastigi imaji buraya otomatik enjekte eder.
           ports:
