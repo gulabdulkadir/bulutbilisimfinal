@@ -21,38 +21,38 @@ spec:
   replicas: 1 # çakışma olmaması için tek replika yaptık.
   selector: # kendi oluşturduğumuz podun alnına etiket yapıştırıyoruz ki yukarıdaki servis onu bulabilsin.
     matchLabels:
-	  app: eczane-mysql # ismi verdiğimiz yer ki servis bu isimle bulabilsin.
+	    app: eczane-mysql # ismi verdiğimiz yer ki servis bu isimle bulabilsin.
   template:
     metadata:
-	  labels:
-	    app: eczane-mysql
-	spec:
-	  containers:
-	  - name: mysql-konteyner
-	    image: mysql:8.0 # docker hubtan resmi mysql imajını çekiyoruz.
-		env:
-		- name: MYSQL_ROOT_PASSWORD
-		  valueFrom:
-		    secretKeyRef:
-			  name: eczane-db-gizli-bilgiler
-			  key: sifre
-		- name:
-		  valueFrom:
-		    secretKeyRef:
-			  name: eczane-db-gizli-bilgiler
-			  key: veritabani_adi
-		ports:
-		- containerPort: 3306
-		volumeMounts: # diskin konteyner içindeki karşılığı.
-		- name: db-kalici-disk
-		  mountPath: /var/lib/mysql # Linux  fabrika ayarı olarak verileri buraya kaydeder. k8s'e diyoruz ki burayı izole et ve takacağımız diski
-		  # buraya bağla.
+	    labels:
+	      app: eczane-mysql
+	  spec:
+	    containers:
+	    - name: mysql-konteyner
+	      image: mysql:8.0 # docker hubtan resmi mysql imajını çekiyoruz.
+		  env:
+		  - name: MYSQL_ROOT_PASSWORD
+		    valueFrom:
+		      secretKeyRef:
+			    name: eczane-db-gizli-bilgiler
+			    key: sifre
+		  - name: MYSQL_DATABASE
+		    valueFrom:
+		      secretKeyRef:
+			    name: eczane-db-gizli-bilgiler
+			    key: veritabani_adi
+		  ports:
+		  - containerPort: 3306
+		  volumeMounts: # diskin konteyner içindeki karşılığı.
+		  - name: db-kalici-disk
+		    mountPath: /var/lib/mysql # Linux  fabrika ayarı olarak verileri buraya kaydeder. k8s'e diyoruz ki burayı izole et ve takacağımız diski
+		    # buraya bağla.
   
   volumeClaimTemplates: # kalıcı disk şablonu
   - metadata:
       name: db-kalici-disk
 	spec:
-	  accesModes: [ "ReadWriteOnce" ] # bu fiziksel diske aynı anda sadece 1 tane node okuyup yazabilsin, tutarlılık için gereklidir.
+	  accessModes: [ "ReadWriteOnce" ] # bu fiziksel diske aynı anda sadece 1 tane node okuyup yazabilsin, tutarlılık için gereklidir.
 	  resources: # sistemin derinliklerinde 2Gi fiziksel bir harddisk alanı ayır, bunu mysql poduma bağla.
 	    requests:
 		  storage: 2Gi

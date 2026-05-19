@@ -1,10 +1,9 @@
 <?php
 class Database {
-    // SENİN ESKİ db.php AYARLARIN
-    private $host = "localhost";
-    private $db_name = "EczaneDB";  // Senin veritabanı adın
+    private $host = "eczane-db-service";
+    private $db_name;
     private $username = "root";
-    private $password = "5270";     // Senin şifren
+    private $password;
     public $conn;
 
     // Singleton örneği
@@ -12,6 +11,12 @@ class Database {
 
     // Bağlantıyı başlatan kurucu metod
     private function __construct() {
+        // DÜZELTİLDİ: Şifre ve DB adını direkt yazmıyoruz. 
+        // K8s Secret'tan gelen ortam değişkenlerini okuyoruz.
+        // Eğer bulamazsa (yerel test için) senin eski değerlerini ("EczaneDB", "5270") kullanır.
+        $this->db_name = getenv('MYSQL_DATABASE') ? getenv('MYSQL_DATABASE') : "EczaneDB";
+        $this->password = getenv('MYSQL_ROOT_PASSWORD') ? getenv('MYSQL_ROOT_PASSWORD') : "5270";
+
         try {
             // PDO bağlantı cümlesi
             $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name . ";charset=utf8mb4", $this->username, $this->password);
@@ -19,7 +24,7 @@ class Database {
             // Hata modunu aç
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            // Varsayılan fetch modunu ayarla (Senin eski dosyan gibi)
+            // Varsayılan fetch modunu ayarla
             $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
             
         } catch(PDOException $exception) {
