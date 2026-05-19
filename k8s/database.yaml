@@ -37,12 +37,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: eczane-db-gizli-bilgiler
-                  key: sifre
+                  key: MYSQL_ROOT_PASSWORD
             - name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
                   name: eczane-db-gizli-bilgiler
-                  key: veritabani_adi
+                  key: MYSQL_DATABASE
           ports:
             - containerPort: 3306
           volumeMounts: # Diskin konteyner icindeki karsiligidir.
