@@ -63,7 +63,7 @@ if ($gelenIlce != "" && $gelenIlac != "") {
 
     <header class="hero-section">
         <div class="hero-content">
-            <h1>İlacınız Hangi Eczanede?</h1>
+            <h1>İlacınız Hangi Eczanede? - HATA VAR BOZUK SURUM</h1>
             <p>Konumunuzu seçin, aradığınız ilacın en yakın hangi eczanede olduğunu hemen bulun.</p>
 
             <form action="index.php" method="GET" class="search-wrapper" style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: white; border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
