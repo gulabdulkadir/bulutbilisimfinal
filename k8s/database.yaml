@@ -1,58 +1,59 @@
 apiVersion: v1
-kind: Service # yine service oluşturduk yani trafik yönlendirmesi yapmasını isteyeceğiz.
+kind: Service # Trafik yonlendirmesi yapmasi icin servis olusturuyoruz.
 metadata:
-# kubernetes içinde isim çözümleme sistemi var burdaki ismi çözümleyecek. Database.php içindeki sunucu adresi satırına localhost yerine bu ismi yazıcaz.
+  # Kubernetes icindeki DNS bu ismi cozumleyecek. 
+  # Projedeki veritabanı baglanti satirina (connection string) localhost yerine bu ismi yaziyoruz.
   name: eczane-db-service
 spec:
-  type: ClusterIP # dışarıdan erişim kapalı sadece cluster içinden izole erişim var.
-  selector: # yine bu etiketteki podları ben yöneticem diye etiket seçtik.
-    app: eczane-mysql
+  type: ClusterIP # Disaridan erisim kapali, sadece cluster icinden izole erisim var.
+  selector:
+    app: eczane-mysql # Bu etikete sahip podu yonlendir diyoruz.
   ports:
     - port: 3306
+      targetPort: 3306
 
 ---
 
-apiVersion: apps/v1 # yine kullanılacak api kütüphanesini belirttik
-kind: StatefulSet
-metadata: # isim verdik buna ulaşabilmek için.
-  name: eczane-db-stateful
+apiVersion: apps/v1
+kind: StatefulSet # Veritabani gibi veri tutarliligi gerektiren yapilar icin StatefulSet kullaniyoruz.
+metadata:
+  name: eczane-db-stateful # Objeye ulasabilmek icin verdigimiz isim.
 spec:
-  serviceName: "eczane-db-service" # yukarda oluşturduğumuz servis ile bağlı olduğunu belirtiyoruz.
-  replicas: 1 # çakışma olmaması için tek replika yaptık.
-  selector: # kendi oluşturduğumuz podun alnına etiket yapıştırıyoruz ki yukarıdaki servis onu bulabilsin.
+  serviceName: "eczane-db-service" # Yukarida olusturdugumuz servis ile bagliyoruz.
+  replicas: 1 # Veri cakislamari olmamasi icin tek replika (tek kopya) olarak calisacak.
+  selector:
     matchLabels:
-	    app: eczane-mysql # ismi verdiğimiz yer ki servis bu isimle bulabilsin.
+      app: eczane-mysql
   template:
     metadata:
-	    labels:
-	      app: eczane-mysql
-	  spec:
-	    containers:
-	    - name: mysql-konteyner
-	      image: mysql:8.0 # docker hubtan resmi mysql imajını çekiyoruz.
-		  env:
-		  - name: MYSQL_ROOT_PASSWORD
-		    valueFrom:
-		      secretKeyRef:
-			    name: eczane-db-gizli-bilgiler
-			    key: sifre
-		  - name: MYSQL_DATABASE
-		    valueFrom:
-		      secretKeyRef:
-			    name: eczane-db-gizli-bilgiler
-			    key: veritabani_adi
-		  ports:
-		  - containerPort: 3306
-		  volumeMounts: # diskin konteyner içindeki karşılığı.
-		  - name: db-kalici-disk
-		    mountPath: /var/lib/mysql # Linux  fabrika ayarı olarak verileri buraya kaydeder. k8s'e diyoruz ki burayı izole et ve takacağımız diski
-		    # buraya bağla.
-  
-  volumeClaimTemplates: # kalıcı disk şablonu
-  - metadata:
-      name: db-kalici-disk
-	spec:
-	  accessModes: [ "ReadWriteOnce" ] # bu fiziksel diske aynı anda sadece 1 tane node okuyup yazabilsin, tutarlılık için gereklidir.
-	  resources: # sistemin derinliklerinde 2Gi fiziksel bir harddisk alanı ayır, bunu mysql poduma bağla.
-	    requests:
-		  storage: 2Gi
+      labels:
+        app: eczane-mysql
+    spec:
+      containers:
+        - name: mysql-konteyner
+          image: mysql:8.0 # Docker Hub uzerindeki resmi MySQL imajini cekiyoruz.
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eczane-db-gizli-bilgiler
+                  key: sifre
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: eczane-db-gizli-bilgiler
+                  key: veritabani_adi
+          ports:
+            - containerPort: 3306
+          volumeMounts: # Diskin konteyner icindeki karsiligi.
+            - name: db-kalici-disk
+              mountPath: /var/lib/mysql # MySQL verileri varsayilan olarak buraya kaydeder, burayi diske bagliyoruz.
+
+  volumeClaimTemplates: # Kalici disk sablonu (Persistent Volume Claim)
+    - metadata:
+        name: db-kalici-disk
+      spec:
+        accessModes: [ "ReadWriteOnce" ] # Bu fiziksel diske ayni anda sadece 1 tane node okuyup yazabilsin.
+        resources:
+          requests:
+            storage: 2Gi # Sistemden 2 Gigabyte'lik fiziksel bir depolama alani talep ediyoruz.
