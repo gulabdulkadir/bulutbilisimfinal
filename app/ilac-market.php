@@ -69,7 +69,7 @@ $urunler = $market->urunleriGetir();
     <header class="store-header">
         <div class="container" style="max-width:1200px; margin:0 auto; padding:0 20px;">
             <h1>Sağlık Market</h1>
-            <p>Eczanelerdeki en uygun fiyatlı ürünlere tek tıkla ulaşın.</p>
+            <p>Eczanelerdeki en uygun fiyatlı ilaçlara tek tıkla ulaşın.</p>
         </div>
     </header>
 
