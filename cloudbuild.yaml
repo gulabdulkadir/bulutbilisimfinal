@@ -17,9 +17,9 @@ steps:
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-b'
       - 'CLOUDSDK_CONTAINER_CLUSTER=eczane-cluster'
-      
+
   - name: 'gcr.io/cloud-builders/kubectl'
-    args: ['rollout', 'restart', 'deployment/eczane-web-deployment']
+    args: ['set', 'image', 'deployment/eczane-web-deployment', 'eczane-php-konteyner=europe-west1-docker.pkg.dev/$PROJECT_ID/eczane-repo/eczane-app:$COMMIT_SHA']
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-b'
       - 'CLOUDSDK_CONTAINER_CLUSTER=eczane-cluster'
