@@ -1,0 +1,18 @@
+steps:
+# 1. Adım imajı oluştur
+# Biz ilk önce build yapacağımız için bize docker işçisi lazım o yüzden -name ile o işçiyi çağırıyoruz docker işlemi yapıcaz
+# ilk önce build işlemi yapıyoruz çağırdığımız docker işçisi ile.
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'europe-west1-docker.pkg.dev/$PROJECT_ID/eczane-repo/eczane-app:$COMMIT_SHA', '.']
+# daha sonra artifact registry içine push ediyoruz.
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'europe-west1-docker.pkg.dev/$PROJECT_ID/eczane-repo/eczane-app:$COMMIT_SHA']
+  # $COMMIT_SHA değişkeni her seferinde unique bir versiyon ismi vererek her seferinde farklı versiyonlama işlemini halleder.
+# burda işçi değişiyor çünkü imajı kubernetese göndericez, kubectl komutlarını anlayan işçiyi çağırıcaz
+# args içindeki kod ise benim k8s içindeki her şeyi kubernetese uygula deriz.
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: ['apply', '-f', 'k8s/']
+  env:
+  # env ise bizim yön bulucumuzdur avrupa sunucusuna git ve orda tam adı eczane-cluster kodları oraya kur.
+  - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-b'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=eczane-cluster'

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+#kubernetesin deploymentı tanıyabilmesi için hangi api'yi kullanması gerektiğini söyleriz. Deploymentlar apps/v1 de yaşar.
+kind: Deployment
+# kubernetese ne yaratmamız gerektiğini söylüyoruz, bana basit bi pod değil akıllı çökünce yenilenen deployment oluştur diyoruz.
+metadata: # objenin kimlik kartı
+  name: eczane-web-deployment # dosyayı ismen çağırabilmek için verdiğimiz isim.
+spec: # fabrikanın nasıl çalışacağını belirttiğimiz kurallar bütünü.
+  replicas: 3 # sitemiz aynı anda 3 replikada çalışsın
+  selector: # deploymentın kendi ürettiği podları tanıması için taktığı takip cihazı gibi, app: eczane-frontend yazan podlar benimdir.
+    matchLabels:
+	  app: eczane-frontend
+  # yeni bir kopya çalıştıracağı zaman template altına bakar ona göre oluşturur.
+  template:
+    metadata: # yine kimlik belirliyoruz.
+	  labels: # her oluşturulan kopyaya eczane-frontend etiketini yapıştırıyoruz. Yukarıdaki selector da bunu takip eder ve kendinin olduğunu anlar.
+	    app: eczane-frontend
+	spec:
+	# bu podun içine konulacak konteynerların listesi.
+	  containers:
+	  - name: eczane-php-konteyner # konteynera verdiğimiz özel isim.
+		# bu container hangi imaj ile çalışacak.
+	    image: europe-west1-docker.pkg.dev/PROJECT_ID/eczane-repo/eczane-app:latest
+		ports:
+		# konteynerın içeriden dünyayı dinlediği port numarası.
+		- containerPort: 80
+---
+
+apiVersion: v1 # serviceler version1 kütüphanesini kullanır.
+kind: Service # kubernetese bir ağ yönlendiricisi yaratmasını söylüyoruz yani service.
+metadata:
+  name: eczane-loadbalancer # bu servise verdiğimiz kimlik ismi.
+spec: # servisin davranış kurallarını burda tanımlarız.
+  type: LoadBalancer # normalde clusterip gibi servisler kapalı devre çalışır ama loadbalancer yazdığımızda dışarıdan erişilebilir bir ip
+  # adresi oluşturur ve bu servise bağlar.
+  selector: # kime yönlendireceğini seçer, kapıya gelen trafiği al ve eczane-frontend yazan podlara dağıt.
+    app: eczane-frontend
+  ports: # kapıların eşleşmesi 
+    - protocol: TCP # standart iletişim protokolü.
+	  port: 80 # dışarıdaki kullanıcının tarayıcıya gireceği port.
+	  targetPort: 80 # içerideki konteynerın hangi portuna yönlendireceğini belirtir. Container 80 portundan dış dünyayı dinliyordu.
