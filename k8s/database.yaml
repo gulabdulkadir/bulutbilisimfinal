@@ -45,7 +45,7 @@ spec:
                   key: veritabani_adi
           ports:
             - containerPort: 3306
-          volumeMounts: # Diskin konteyner icindeki karsiligi.
+          volumeMounts: # Diskin konteyner icindeki karsiligidir.
             - name: db-kalici-disk
               mountPath: /var/lib/mysql # MySQL verileri varsayilan olarak buraya kaydeder, burayi diske bagliyoruz.
 
