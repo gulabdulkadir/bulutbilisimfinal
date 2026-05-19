@@ -2,18 +2,24 @@ steps:
   # 1. Adim: Imaji olustur
   # Ilk once build yapacagimiz icin docker iscisine ihtiyacimiz var, o yuzden gcr.io/cloud-builders/docker iscisini cagiriyoruz.
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'europe-west1-docker.pkg.dev/$PROJECT_ID/eczane-repo/eczane-app:$COMMIT_SHA', '.']
+    args: ['build', '-t', 'europe-west1-docker.pkg.dev/$PROJECT_ID/eczane-repo/eczane-app:$COMMIT_SHA', '-t', 'europe-west1-docker.pkg.dev/$PROJECT_ID/eczane-repo/eczane-app:latest', '.']
 
   # 2. Adim: Imaji Artifact Registry icine push et
   # $COMMIT_SHA degiskeni her push isleminde benzersiz bir versiyon ismi vererek versiyonlama islemini halleder.
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'europe-west1-docker.pkg.dev/$PROJECT_ID/eczane-repo/eczane-app:$COMMIT_SHA']
+    args: ['push', 'europe-west1-docker.pkg.dev/$PROJECT_ID/eczane-repo/eczane-app', '--all-tags']
 
   # 3. Adim: Kubernetes uzerine dagitim (Deploy) yap
   # Burada isci degisiyor cunku imaji Kubernetes'e gonderecegiz. Kubectl komutlarini anlayan isciyi cagiriyoruz.
   # --validate=false parametresi ile Authorized Networks kalkanina takilmadan sema kontrolunu bypass ediyoruz.
   - name: 'gcr.io/cloud-builders/kubectl'
     args: ['apply', '-f', 'k8s/', '--validate=false']
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-b'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=eczane-cluster'
+      
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['rollout', 'restart', 'deployment/eczane-web-deployment']
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-b'
       - 'CLOUDSDK_CONTAINER_CLUSTER=eczane-cluster'
