@@ -21,6 +21,17 @@ spec:
           # Boylece Cloud Build her tetiklendiginde en guncel bastigi imaji buraya otomatik enjekte eder.
           ports:
             - containerPort: 80 # Konteynerin iceriden dinledigi port numarasi.
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eczane-db-gizli-bilgiler
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: eczane-db-gizli-bilgiler
+                  key: MYSQL_DATABASE
 ---
 apiVersion: v1
 # Servisler v1 kütüphanesini kullanir.
