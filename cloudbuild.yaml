@@ -13,6 +13,8 @@ steps:
 - name: 'gcr.io/cloud-builders/kubectl'
   args: ['apply', '-f', 'k8s/']
   env:
+  options:
+  logging: CLOUD_LOGGING_ONLY
   # env ise bizim yön bulucumuzdur avrupa sunucusuna git ve orda tam adı eczane-cluster kodları oraya kur.
   - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-b'
   - 'CLOUDSDK_CONTAINER_CLUSTER=eczane-cluster'
