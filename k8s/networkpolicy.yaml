@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: veritabani-guvenligi
+spec:
+  podSelector:
+    matchLabels:
+      app: eczane-mysql # Kuralin uygulanacagi pod (Veritabani)
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: eczane-frontend # SADECE frontend etiketli podlardan gelen trafige izin ver!
+    ports:
+    - protocol: TCP
+      port: 3306
