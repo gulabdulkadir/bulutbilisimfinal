@@ -9,17 +9,14 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'europe-west1-docker.pkg.dev/$PROJECT_ID/eczane-repo/eczane-app', '--all-tags']
 
+  - name: 'ubuntu'
+    args: ['sed', '-i', 's/latest/${COMMIT_SHA}/g', 'k8s/frontend.yaml']
+
   # 3. Adim: Kubernetes uzerine dagitim (Deploy) yap
   # Burada isci degisiyor cunku imaji Kubernetes'e gonderecegiz. Kubectl komutlarini anlayan isciyi cagiriyoruz.
   # --validate=false parametresi ile Authorized Networks kalkanina takilmadan sema kontrolunu bypass ediyoruz.
   - name: 'gcr.io/cloud-builders/kubectl'
     args: ['apply', '-f', 'k8s/', '--validate=false']
-    env:
-      - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-b'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=eczane-cluster'
-
-  - name: 'gcr.io/cloud-builders/kubectl'
-    args: ['set', 'image', 'deployment/eczane-web-deployment', 'eczane-php-konteyner=europe-west1-docker.pkg.dev/$PROJECT_ID/eczane-repo/eczane-app:$COMMIT_SHA']
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-b'
       - 'CLOUDSDK_CONTAINER_CLUSTER=eczane-cluster'
