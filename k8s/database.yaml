@@ -49,7 +49,7 @@ spec:
             - name: db-kalici-disk
               mountPath: /var/lib/mysql # MySQL verileri varsayilan olarak buraya kaydeder, burayi diske bagliyoruz.
 
-  volumeClaimTemplates: # Kalici disk sablonu (Persistent Volume Claim).
+  volumeClaimTemplates: # Kalici disk sablonu (Persistent Volume Claim)
     - metadata:
         name: db-kalici-disk
       spec:
