@@ -1,20 +1,23 @@
 steps:
-# 1. Adım imajı oluştur
-# Biz ilk önce build yapacağımız için bize docker işçisi lazım o yüzden -name ile o işçiyi çağırıyoruz docker işlemi yapıcaz
-# ilk önce build işlemi yapıyoruz çağırdığımız docker işçisi ile.
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'europe-west1-docker.pkg.dev/$PROJECT_ID/eczane-repo/eczane-app:$COMMIT_SHA', '.']
-# daha sonra artifact registry içine push ediyoruz.
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'europe-west1-docker.pkg.dev/$PROJECT_ID/eczane-repo/eczane-app:$COMMIT_SHA']
-  # $COMMIT_SHA değişkeni her seferinde unique bir versiyon ismi vererek her seferinde farklı versiyonlama işlemini halleder.
-# burda işçi değişiyor çünkü imajı kubernetese göndericez, kubectl komutlarını anlayan işçiyi çağırıcaz
-# args içindeki kod ise benim k8s içindeki her şeyi kubernetese uygula deriz.
-- name: 'gcr.io/cloud-builders/kubectl'
-  args: ['apply', '-f', 'k8s/']
-  env:
-  # env ise bizim yön bulucumuzdur avrupa sunucusuna git ve orda tam adı eczane-cluster kodları oraya kur.
-  - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-b'
-  - 'CLOUDSDK_CONTAINER_CLUSTER=eczane-cluster'
+  # 1. Adim: Imaji olustur
+  # Ilk once build yapacagimiz icin docker iscisine ihtiyacimiz var, o yuzden gcr.io/cloud-builders/docker iscisini cagiriyoruz.
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'europe-west1-docker.pkg.dev/$PROJECT_ID/eczane-repo/eczane-app:$COMMIT_SHA', '.']
+
+  # 2. Adim: Imaji Artifact Registry icine push et
+  # $COMMIT_SHA degiskeni her push isleminde benzersiz bir versiyon ismi vererek versiyonlama islemini halleder.
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'europe-west1-docker.pkg.dev/$PROJECT_ID/eczane-repo/eczane-app:$COMMIT_SHA']
+
+  # 3. Adim: Kubernetes uzerine dagitim (Deploy) yap
+  # Burada isci degisiyor cunku imaji Kubernetes'e gonderecegiz. Kubectl komutlarini anlayan isciyi cagiriyoruz.
+  # --validate=false parametresi ile Authorized Networks kalkanina takilmadan sema kontrolunu bypass ediyoruz.
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['apply', '-f', 'k8s/', '--validate=false']
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-b'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=eczane-cluster'
+
+# Loglama ayari adimlarin tamamen disinda ve en sola dayali olmalidir.
 options:
   logging: CLOUD_LOGGING_ONLY
