@@ -1,3 +1,19 @@
+<div align="center">
+  <h2>T.C. Bartın Üniversitesi</h2>
+  <h3>Bilgisayar Mühendisliği Bölümü</h3>
+  <br>
+  <h1> e-Ecza Otomasyon ve Dağıtım Projesi </h1>
+  <p>Bulut Bilişim ve DevOps Mimarisi Proje Teslimi</p>
+</div>
+
+---
+
+###  Proje Ekibi
+* **Abdülkadir GÜL** - 23010310034
+* **Arda ULUIŞIK** - 23010310077
+
+---
+
 # e-Ecza Otomasyon ve Dağıtım Projesi
 
 Bu proje, bir web uygulamasının Docker konteyner haline getirilerek Google Kubernetes Engine (GKE) üzerinde yüksek erişilebilirlik, ağ güvenliği, kalıcı veri depolama ve tam otomatik bir CI/CD boru hattı (Pipeline) ile canlıya alınmasını içeren uçtan uca bir DevOps mimarisidir.
