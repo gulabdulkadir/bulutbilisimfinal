@@ -4,7 +4,7 @@ Bu proje, bir web uygulamasının Docker konteyner haline getirilerek Google Kub
 
 ## Sistem Mimari Şeması
 Projenin internet trafiği ve CI/CD otomasyon akışı aşağıdaki şemada modellenmiştir:
-![Sistem Mimarisi](bulut-bilisim-sema.png)
+![Sistem Mimarisi](bulutbilisim-final-sema.png)
 
 ## Kullanılan Teknolojiler ve Altyapı
 * **Web Uygulaması:** PHP 8.2 & Apache Sunucusu
